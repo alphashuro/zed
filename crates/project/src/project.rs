@@ -322,6 +322,12 @@ pub enum Event {
     SnippetEdit(BufferId, Vec<(lsp::Range, Snippet)>),
     ExpandedAllForEntry(WorktreeId, ProjectEntryId),
     AgentLocationChanged,
+    ShowDocument {
+        url: lsp::Url,
+        external: Option<bool>,
+        language_server_id: LanguageServerId,
+        language_server_name: LanguageServerName,
+    },
 }
 
 pub struct AgentLocationChanged;
@@ -2933,6 +2939,17 @@ impl Project {
                     cx.emit(Event::SnippetEdit(*buffer_id, edits.clone()))
                 }
             }
+            LspStoreEvent::ShowDocument {
+                url,
+                external,
+                language_server_id,
+                language_server_name,
+            } => cx.emit(Event::ShowDocument {
+                url: url.clone(),
+                external: external.clone(),
+                language_server_id: language_server_id.clone(),
+                language_server_name: language_server_name.clone(),
+            }),
         }
     }
 

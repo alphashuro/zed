@@ -11,7 +11,7 @@ use futures::{
     io::BufWriter,
     select,
 };
-use gpui::{App, AppContext as _, AsyncApp, BackgroundExecutor, SharedString, Task};
+use gpui::{App, AppContext as _, AsyncApp, BackgroundExecutor, SharedString, Task, actions};
 use notification::DidChangeWorkspaceFolders;
 use parking_lot::{Mutex, RwLock};
 use postage::{barrier, prelude::Stream};
@@ -47,6 +47,8 @@ const CONTENT_LEN_HEADER: &str = "Content-Length: ";
 
 const LSP_REQUEST_TIMEOUT: Duration = Duration::from_secs(60 * 2);
 const SERVER_SHUTDOWN_TIMEOUT: Duration = Duration::from_secs(5);
+
+actions!(editor, [ToggleLspWorkspaceCommandSelector]);
 
 type NotificationHandler = Box<dyn Send + FnMut(Option<RequestId>, Value, &mut AsyncApp)>;
 type ResponseHandler = Box<dyn Send + FnOnce(Result<String, Error>)>;
