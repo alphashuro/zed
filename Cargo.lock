@@ -9732,6 +9732,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "lsp_workspace_command"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "editor",
+ "file_finder",
+ "file_icons",
+ "fuzzy",
+ "gpui",
+ "language",
+ "log",
+ "lsp",
+ "picker",
+ "project",
+ "settings",
+ "ui",
+ "util",
+ "workspace",
+ "workspace-hack",
+]
+
+[[package]]
 name = "lyon"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -20273,6 +20295,7 @@ dependencies = [
  "languages",
  "libc",
  "log",
+ "lsp_workspace_command",
  "markdown",
  "markdown_preview",
  "menu",

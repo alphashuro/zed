@@ -1215,6 +1215,44 @@ impl Workspace {
                     this.handle_agent_location_changed(window, cx)
                 }
 
+                project::Event::ShowDocument {
+                    url,
+                    external: _,
+                    language_server_id: _,
+                    language_server_name: _,
+                } => {
+                    if let Ok(path_buf) = url.to_file_path() {
+                        cx.spawn_in(window, async move |workspace, cx| {
+                            let maybe_open_path_task = workspace
+                                .update(cx, |workspace, cx| {
+                                    workspace.project().update(cx, |project, cx| {
+                                        project.project_path_for_absolute_path(&path_buf, cx)
+                                    })
+                                })
+                                .log_err()
+                                .flatten()
+                                .and_then(|project_path| {
+                                    workspace
+                                        .update_in(cx, |workspace, window, cx| {
+                                            workspace.open_path(
+                                                project_path,
+                                                None,
+                                                true,
+                                                window,
+                                                cx,
+                                            )
+                                        })
+                                        .log_err()
+                                });
+
+                            if let Some(task) = maybe_open_path_task {
+                                let _ = task.await.log_err();
+                            };
+                        })
+                        .detach();
+                    }
+                }
+
                 _ => {}
             }
             cx.notify()

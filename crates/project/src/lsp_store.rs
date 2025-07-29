@@ -952,6 +952,36 @@ impl LocalLspStore {
                 }
             })
             .detach();
+
+        language_server
+            .on_request::<lsp::request::ShowDocument, _, _>({
+                let this = this.clone();
+                let id = language_server.server_id().clone();
+                let name = name.clone();
+
+                move |params, cx| {
+                    let this = this.clone();
+                    let mut cx = cx.clone();
+                    let name = name.clone();
+
+                    async move {
+                        let res = this.update(&mut cx, |_this, cx| {
+                            cx.emit(LspStoreEvent::ShowDocument {
+                                url: params.uri,
+                                external: params.external,
+                                language_server_name: name.clone(),
+                                language_server_id: id.clone(),
+                            });
+                        });
+
+                        Ok(lsp::ShowDocumentResult {
+                            success: res.is_ok(),
+                        })
+                    }
+                }
+            })
+            .detach();
+
         language_server
             .on_notification::<lsp::notification::ShowMessage, _>({
                 let this = this.clone();
@@ -3598,6 +3628,12 @@ pub enum LspStoreEvent {
         buffer_id: BufferId,
         edits: Vec<(lsp::Range, Snippet)>,
         most_recent_edit: clock::Lamport,
+    },
+    ShowDocument {
+        url: Url,
+        external: Option<bool>,
+        language_server_name: LanguageServerName,
+        language_server_id: LanguageServerId,
     },
 }
 
